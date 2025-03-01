@@ -1,0 +1,13 @@
+pandas
+numpy 
+matplotlib
+seaborn
+dotenv
+uuid
+torch
+torchvision
+opencv-python
+ultralytics
+mtcnn
+tensorflow
+deepface
