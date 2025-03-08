@@ -1,4 +1,4 @@
-import os, sys
+import os
 import numpy as np
 import cv2
 import psycopg2
@@ -18,6 +18,9 @@ DB_PORT = os.getenv("DB_PORT")
 # Path to the folder containing face images
 FACE_IMAGE_FOLDER = "../data/faces/"
 
+# Create a global MTCNN detector
+detector = MTCNN()
+
 # Connect to PostgreSQL database
 def connect_db():
     try:
@@ -33,24 +36,30 @@ def connect_db():
         print("Error connecting to database:", e)
         return None
 
-# Create table if it doesn't exist
+# Create table
 def create_table():
     conn = connect_db()
     if conn is None:
         return
-    query = '''
+    cursor = conn.cursor()
+    # Create table with vector column 
+    query_table = '''
     CREATE TABLE IF NOT EXISTS face_embeddings (
         id UUID PRIMARY KEY,
         name TEXT NOT NULL,
-        embedding FLOAT8[] NOT NULL
+        embedding vector(128) NOT NULL
     );
     '''
-    cursor = conn.cursor()
-    cursor.execute(query)
+    cursor.execute(query_table)
+    # Create HNSW index on the embedding column for fast similarity search
+    query_index = '''
+    CREATE INDEX IF NOT EXISTS face_embeddings_hnsw_idx ON face_embeddings USING hnsw (embedding vector_l2_ops);
+    '''
+    cursor.execute(query_index)
     conn.commit()
     cursor.close()
     conn.close()
-    print("Database table created successfully!")
+    print("Database table and HNSW index created successfully!")
 
 # Preprocess image: detect and crop the face using MTCNN
 def preprocess_image(image_path):
@@ -58,18 +67,12 @@ def preprocess_image(image_path):
     if image is None:
         print(f"Could not read image {image_path}")
         return None
-    # Convert from BGR to RGB
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    
-    detector = MTCNN()
     faces = detector.detect_faces(image_rgb)
     if len(faces) == 0:
         print(f"No face detected in {image_path}")
         return None
-
-    # Use the first detected face
     x, y, width, height = faces[0]['box']
-    # Ensure coordinates are non-negative
     x, y = abs(x), abs(y)
     face = image_rgb[y:y+height, x:x+width]
     face = cv2.resize(face, (160, 160))
@@ -81,23 +84,28 @@ def get_face_embedding(image_path):
     if face is None:
         return None
     try:
-        # Pass the image array using the "img_path" parameter and disable enforced detection
-        result = DeepFace.represent(img_path=face, model_name="Facenet", enforce_detection=False)
-        embedding = result[0]['embedding']  # Extract the embedding vector
-        return np.array(embedding)
+        result = DeepFace.represent(face, model_name="Facenet", enforce_detection=False)
+        embedding = result[0]['embedding']
+        # Normalize the embedding
+        embedding = np.array(embedding)
+        norm = np.linalg.norm(embedding)
+        if norm != 0:
+            embedding = embedding / norm
+        return embedding
     except Exception as e:
         print(f"Error processing {image_path}: {e}")
         return None
-
+    
 # Store embedding in PostgreSQL
 def store_face_embedding(name, embedding):
     conn = connect_db()
     if conn is None:
         return
     cursor = conn.cursor()
-    user_id = uuid.uuid4()  # Generate a unique ID usable for voice recognition as well
-    query = "INSERT INTO face_embeddings (id, name, embedding) VALUES (%s, %s, %s)"
-    cursor.execute(query, (str(user_id), name, embedding.tolist()))
+    user_id = uuid.uuid4()  # Unique ID
+    embedding_str = '[' + ','.join(map(str, embedding.tolist())) + ']'    # Convert embedding to a vector literal string (e.g., "[0.1,0.2,...]")
+    query = "INSERT INTO face_embeddings (id, name, embedding) VALUES (%s, %s, %s::vector)"
+    cursor.execute(query, (str(user_id), name, embedding_str))
     conn.commit()
     cursor.close()
     conn.close()
@@ -109,7 +117,7 @@ def process_all_faces():
     for filename in os.listdir(FACE_IMAGE_FOLDER):
         if filename.lower().endswith(('.jpg', '.jpeg', '.png')):
             image_path = os.path.join(FACE_IMAGE_FOLDER, filename)
-            name = os.path.splitext(filename)[0]  # Extract name from filename
+            name = os.path.splitext(filename)[0]
             print(f"Processing {name} from {filename}...")
             embedding = get_face_embedding(image_path)
             if embedding is not None:

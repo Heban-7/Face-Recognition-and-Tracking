@@ -1,6 +1,7 @@
 import os
 import cv2
 import numpy as np
+import logging
 import psycopg2
 from deepface import DeepFace
 from mtcnn import MTCNN
@@ -14,8 +15,24 @@ DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
 DB_PORT = os.getenv("DB_PORT")
 
-# Connect to PostgreSQL
-def connect_db():
+# Ensure logs folder exist
+os.makedirs('../logs', exist_ok=True)
+
+# Cinfigure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format= "%(asctime)s - %(levelname)s - %(message)s",
+    handlers=[
+        logging.FileHandler('../logs/realtime_face_recognition.log'),
+        logging.StreamHandler()
+    ]
+)
+
+# Global detector 
+detector = MTCNN()
+
+def get_db_connection():
+    """Establish a PostgreSQL database connection."""
     try:
         conn = psycopg2.connect(
             host=DB_HOST,
@@ -24,91 +41,112 @@ def connect_db():
             password=DB_PASSWORD,
             port=DB_PORT
         )
+        logging.info("Database connection established.")
         return conn
     except Exception as e:
-        print("Error connecting to database:", e)
+        logging.error("Error connecting to database: %s", e)
         return None
 
-# Load stored face embeddings from the database
-def get_stored_faces():
-    conn = connect_db()
-    if conn is None:
-        return []
-    cursor = conn.cursor()
-    cursor.execute("SELECT id, name, embedding FROM face_embeddings")
-    faces = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    # Convert embedding from list to numpy array for comparison
-    return [(str(face[0]), face[1], np.array(face[2])) for face in faces]
+def find_nearest_face(conn, embedding):
+    """
+    Find the nearest face from the database using pgvector similarity search.
+    Returns the name and cosine distance.
+    """
+    try:
+        cursor = conn.cursor()
+        embedding_str = '[' + ','.join(map(str, embedding.tolist())) + ']'
+        query = """
+        SELECT id, name, embedding <=> %s::vector AS cosine_distance
+        FROM face_embeddings
+        ORDER BY embedding <=> %s::vector
+        LIMIT 1;
+        """
+        cursor.execute(query, (embedding_str, embedding_str))
+        result = cursor.fetchone()
+        cursor.close()
+        if result is None:
+            return None, None
+        return result[1], result[2]
+    except Exception as e:
+        logging.error("Error in find_nearest_face: %s", e)
+        return None, None
 
-# Process each frame to detect and recognize faces
-def recognize_faces_in_frame(frame, stored_faces, detector, threshold=0.6):
+def get_face_embedding(face_img):
+    """Extract and normalize the face embedding using DeepFace."""
+    try:
+        result = DeepFace.represent(face_img, model_name="Facenet", enforce_detection=False)
+        embedding = np.array(result[0]['embedding'])
+        norm = np.linalg.norm(embedding)
+        if norm != 0:
+            embedding = embedding / norm
+        return embedding
+    except Exception as e:
+        logging.warning("Error extracting face embedding: %s", e)
+        return None
+
+def detect_and_recognize_faces(frame, conn, threshold=0.3):
+    """
+    Detect and recognize faces in a video frame.
+    Returns a list of tuples: (x, y, width, height, recognized_name).
+    """
     recognized_faces = []
-    # Convert frame to RGB (MTCNN requires RGB)
     frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     faces = detector.detect_faces(frame_rgb)
+    
     for face in faces:
-        x, y, width, height = face['box']
-        # Ensure coordinates are valid
-        x, y = abs(x), abs(y)
-        face_img = frame_rgb[y:y+height, x:x+width]
-        face_img = cv2.resize(face_img, (160, 160))
-        
-        # Extract embedding using DeepFace (pass the image array)
         try:
-            result = DeepFace.represent(img_path=face_img, model_name="Facenet", enforce_detection=False)
-            embedding = result[0]['embedding']
+            x, y, width, height = face['box']
+            x, y = abs(x), abs(y)
+            face_img = frame_rgb[y:y+height, x:x+width]
+            face_img = cv2.resize(face_img, (160, 160))
+            embedding = get_face_embedding(face_img)
+            if embedding is None:
+                continue
         except Exception as e:
-            print("Error extracting face embedding:", e)
+            logging.warning("Error processing face: %s", e)
             continue
 
         recognized_name = "Unknown"
-        for user_id, name, stored_embedding in stored_faces:
-            distance = np.linalg.norm(np.array(embedding) - stored_embedding)
-            if distance < threshold:
-                recognized_name = name
-                break
+        name, cosine_distance = find_nearest_face(conn, embedding)
+        if cosine_distance is not None and cosine_distance < threshold:
+            recognized_name = name
 
         recognized_faces.append((x, y, width, height, recognized_name))
     return recognized_faces
 
-def main():
-    # Load stored embeddings once at the start
-    stored_faces = get_stored_faces()
-    if len(stored_faces) == 0:
-        print("No stored face embeddings found in the database.")
+def run_video_recognition():
+    """Run real-time face recognition using the webcam."""
+    conn = get_db_connection()
+    if conn is None:
+        logging.error("Database connection failed. Exiting.")
         return
 
-    detector = MTCNN()
-
-    # Open the default video capture device (usually the webcam)
     cap = cv2.VideoCapture(0)
     if not cap.isOpened():
-        print("Cannot open video stream")
+        logging.error("Cannot open video stream.")
         return
 
+    logging.info("Starting real-time face recognition. Press 'q' to exit.")
     while True:
         ret, frame = cap.read()
         if not ret:
-            print("Failed to capture frame. Exiting ...")
+            logging.error("Failed to capture frame. Exiting...")
             break
 
-        # Recognize faces in the current frame
-        recognized_faces = recognize_faces_in_frame(frame, stored_faces, detector, threshold=0.6)
-
-        # Draw bounding boxes and names for each detected face
-        for (x, y, width, height, name) in recognized_faces:
-            cv2.rectangle(frame, (x, y), (x+width, y+height), (0, 255, 0), 2)
-            cv2.putText(frame, name, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (36, 255, 12), 2)
+        recognized_faces = detect_and_recognize_faces(frame, conn)
+        for (x, y, width, height, recognized_name) in recognized_faces:
+            cv2.rectangle(frame, (x, y), (x + width, y + height), (0, 255, 0), 2)
+            cv2.putText(frame, recognized_name, (x, y - 10),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.9, (36, 255, 12), 2)
 
         cv2.imshow("Real-Time Face Recognition", frame)
-        # Press 'q' to exit the video loop
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
     cap.release()
+    conn.close()
     cv2.destroyAllWindows()
+    logging.info("Resources released. Exiting.")
 
 if __name__ == "__main__":
-    main()
+    run_video_recognition()

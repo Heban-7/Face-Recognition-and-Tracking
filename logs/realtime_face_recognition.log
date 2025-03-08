@@ -1,0 +1,165 @@
+2025-03-06 09:30:41,406 - INFO - FaceNet model loaded successfully.
+2025-03-06 09:31:40,600 - INFO - Database connection established.
+2025-03-06 09:31:41,383 - INFO - Starting real-time face recognition. Press 'q' to exit.
+2025-03-06 09:31:42,249 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:42,502 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:42,723 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:42,944 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:43,166 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:43,384 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:43,595 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:43,838 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:44,065 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:44,281 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:44,502 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:44,710 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:44,915 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:45,146 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:45,370 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:45,579 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:45,820 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:46,039 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:46,248 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:46,466 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:46,680 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:46,906 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:47,122 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:47,328 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:47,539 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:47,757 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:47,985 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:48,185 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:48,412 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:48,615 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:48,832 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:49,054 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:49,297 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:49,505 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:49,717 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:49,928 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:50,150 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:50,383 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:50,593 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:50,811 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:51,028 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:51,246 - WARNING - Error extracting face embedding: represent() got an unexpected keyword argument 'model'
+2025-03-06 09:31:51,598 - INFO - Resources released. Exiting.
+2025-03-06 09:43:56,223 - INFO - FaceNet model loaded successfully.
+2025-03-06 09:45:26,702 - INFO - Database connection established.
+2025-03-06 09:45:27,259 - INFO - Starting real-time face recognition. Press 'q' to exit.
+2025-03-06 09:45:55,363 - INFO - Resources released. Exiting.
+2025-03-06 09:53:39,819 - INFO - Database connection established.
+2025-03-06 09:53:40,202 - INFO - Starting real-time face recognition. Press 'q' to exit.
+2025-03-06 09:53:49,235 - INFO - Resources released. Exiting.
+2025-03-06 09:54:07,838 - INFO - Database connection established.
+2025-03-06 09:54:08,152 - INFO - Starting real-time face recognition. Press 'q' to exit.
+2025-03-06 09:54:23,413 - INFO - Resources released. Exiting.
+2025-03-06 12:06:59,871 - INFO - FaceNet model loaded successfully.
+2025-03-06 12:07:09,527 - INFO - Database connection established.
+2025-03-06 12:07:09,975 - INFO - Starting real-time face recognition. Press 'q' to exit.
+2025-03-06 12:07:21,640 - INFO - Resources released. Exiting.
+2025-03-06 18:18:20,171 - INFO - FaceNet model loaded successfully.
+2025-03-06 18:18:35,503 - INFO - Database connection established.
+2025-03-06 18:18:35,799 - INFO - Starting real-time face recognition. Press 'q' to exit.
+2025-03-06 18:19:20,412 - INFO - Resources released. Exiting.
+2025-03-06 18:20:37,819 - INFO - Database connection established.
+2025-03-06 18:20:38,062 - INFO - Starting real-time face recognition. Press 'q' to exit.
+2025-03-06 18:21:06,741 - INFO - Resources released. Exiting.
+2025-03-06 23:00:50,888 - INFO - FaceNet model loaded successfully.
+2025-03-06 23:01:06,056 - INFO - Database connection established.
+2025-03-06 23:01:06,454 - INFO - Starting real-time face recognition. Press 'q' to exit.
+2025-03-06 23:01:23,498 - INFO - Resources released. Exiting.
+2025-03-06 23:02:12,757 - INFO - Database connection established.
+2025-03-06 23:02:13,016 - INFO - Starting real-time face recognition. Press 'q' to exit.
+2025-03-06 23:03:03,525 - INFO - Resources released. Exiting.
+2025-03-07 09:11:30,750 - INFO - FaceNet model loaded successfully.
+2025-03-07 09:11:43,274 - INFO - Database connection established.
+2025-03-07 09:11:44,137 - INFO - Starting real-time face recognition. Press 'q' to exit.
+2025-03-07 09:12:19,869 - INFO - Resources released. Exiting.
+2025-03-07 09:46:52,525 - INFO - Database connection established.
+2025-03-07 09:46:53,073 - INFO - Starting real-time face recognition. Press 'q' to exit.
+2025-03-07 09:47:12,012 - INFO - Resources released. Exiting.
+2025-03-07 09:54:11,360 - INFO - MTCNN model loaded successfully.
+2025-03-07 09:54:30,539 - INFO - Database connection established.
+2025-03-07 09:54:31,315 - INFO - Starting real-time face recognition. Press 'q' to exit.
+2025-03-07 09:54:54,608 - INFO - Resources released. Exiting.
+2025-03-07 11:04:51,956 - INFO - Database connection established.
+2025-03-07 11:04:52,319 - INFO - Starting real-time face recognition. Press 'q' to exit.
+2025-03-07 11:05:04,500 - INFO - Resources released. Exiting.
+2025-03-07 11:07:48,189 - INFO - Database connection established.
+2025-03-07 11:07:48,509 - INFO - Starting real-time face recognition. Press 'q' to exit.
+2025-03-07 11:08:20,124 - INFO - Resources released. Exiting.
+2025-03-07 11:09:50,778 - INFO - Database connection established.
+2025-03-07 11:09:51,065 - INFO - Starting real-time face recognition. Press 'q' to exit.
+2025-03-07 11:09:59,468 - INFO - Resources released. Exiting.
+2025-03-07 11:10:12,864 - INFO - Database connection established.
+2025-03-07 11:10:13,115 - INFO - Starting real-time face recognition. Press 'q' to exit.
+2025-03-07 11:10:21,761 - INFO - Resources released. Exiting.
+2025-03-07 11:29:05,852 - INFO - Database connection established.
+2025-03-07 11:29:06,155 - INFO - Starting real-time face recognition. Press 'q' to exit.
+2025-03-07 11:29:22,748 - INFO - Resources released. Exiting.
+2025-03-07 11:29:43,615 - INFO - Database connection established.
+2025-03-07 11:29:43,854 - INFO - Starting real-time face recognition. Press 'q' to exit.
+2025-03-07 11:29:54,191 - INFO - Resources released. Exiting.
+2025-03-07 11:30:42,595 - INFO - Database connection established.
+2025-03-07 11:30:42,846 - INFO - Starting real-time face recognition. Press 'q' to exit.
+2025-03-07 11:30:50,303 - INFO - Resources released. Exiting.
+2025-03-07 11:34:22,387 - INFO - Database connection established.
+2025-03-07 11:34:22,631 - INFO - Starting real-time face recognition. Press 'q' to exit.
+2025-03-07 11:34:27,258 - INFO - Resources released. Exiting.
+2025-03-07 11:54:36,076 - INFO - Database connection established.
+2025-03-07 11:54:36,378 - INFO - Starting real-time face recognition. Press 'q' to exit.
+2025-03-07 11:54:44,387 - INFO - Resources released. Exiting.
+2025-03-07 11:54:53,401 - INFO - Database connection established.
+2025-03-07 11:54:53,652 - INFO - Starting real-time face recognition. Press 'q' to exit.
+2025-03-07 11:55:13,221 - INFO - Resources released. Exiting.
+2025-03-07 11:57:21,565 - INFO - Database connection established.
+2025-03-07 11:57:21,868 - INFO - Starting real-time face recognition. Press 'q' to exit.
+2025-03-07 11:57:34,703 - INFO - Resources released. Exiting.
+2025-03-07 11:57:50,946 - INFO - MTCNN model loaded successfully.
+2025-03-07 11:58:07,642 - INFO - Database connection established.
+2025-03-07 11:58:08,051 - INFO - Starting real-time face recognition. Press 'q' to exit.
+2025-03-07 11:58:25,029 - INFO - Resources released. Exiting.
+2025-03-07 11:59:48,112 - INFO - Database connection established.
+2025-03-07 11:59:48,386 - INFO - Starting real-time face recognition. Press 'q' to exit.
+2025-03-07 11:59:54,666 - INFO - Resources released. Exiting.
+2025-03-07 12:00:06,868 - INFO - Database connection established.
+2025-03-07 12:00:07,111 - INFO - Starting real-time face recognition. Press 'q' to exit.
+2025-03-07 12:00:13,422 - INFO - Resources released. Exiting.
+2025-03-07 12:06:51,054 - INFO - MTCNN model loaded successfully.
+2025-03-07 12:06:54,530 - INFO - Database connection established.
+2025-03-07 12:06:54,921 - INFO - Starting real-time face recognition. Press 'q' to exit.
+2025-03-07 12:07:07,868 - INFO - Resources released. Exiting.
+2025-03-07 12:07:15,983 - INFO - Database connection established.
+2025-03-07 12:07:16,210 - INFO - Starting real-time face recognition. Press 'q' to exit.
+2025-03-07 12:07:21,149 - INFO - Resources released. Exiting.
+2025-03-07 12:07:29,631 - INFO - Database connection established.
+2025-03-07 12:07:29,853 - INFO - Starting real-time face recognition. Press 'q' to exit.
+2025-03-07 12:07:33,593 - INFO - Resources released. Exiting.
+2025-03-07 12:07:56,761 - INFO - Database connection established.
+2025-03-07 12:07:56,989 - INFO - Starting real-time face recognition. Press 'q' to exit.
+2025-03-07 12:08:04,139 - INFO - Resources released. Exiting.
+2025-03-07 12:09:30,413 - INFO - Database connection established.
+2025-03-07 12:09:30,682 - INFO - Starting real-time face recognition. Press 'q' to exit.
+2025-03-07 12:09:48,129 - INFO - Resources released. Exiting.
+2025-03-07 14:16:44,700 - INFO - MTCNN model loaded successfully.
+2025-03-07 14:16:57,427 - INFO - Database connection established.
+2025-03-07 14:16:58,055 - INFO - Starting real-time face recognition. Press 'q' to exit.
+2025-03-07 14:18:20,670 - INFO - Resources released. Exiting.
+2025-03-07 14:18:23,506 - INFO - Database connection established.
+2025-03-07 14:18:23,999 - INFO - Starting real-time face recognition. Press 'q' to exit.
+2025-03-07 14:19:10,914 - INFO - Resources released. Exiting.
+2025-03-08 18:43:42,648 - INFO - MTCNN model loaded successfully.
+2025-03-08 18:43:53,421 - INFO - Database connection established.
+2025-03-08 18:43:53,820 - INFO - Starting real-time face recognition. Press 'q' to exit.
+2025-03-08 18:44:27,508 - INFO - Resources released. Exiting.
+2025-03-08 21:48:29,907 - INFO - Database connection established.
+2025-03-08 21:48:30,223 - INFO - Starting real-time face recognition. Press 'q' to exit.
+2025-03-08 21:48:41,864 - INFO - Resources released. Exiting.
+2025-03-08 21:49:27,669 - INFO - Database connection established.
+2025-03-08 21:49:27,901 - INFO - Starting real-time face recognition. Press 'q' to exit.
+2025-03-08 21:49:39,098 - INFO - Resources released. Exiting.
+2025-03-08 23:49:55,274 - INFO - MTCNN model loaded successfully.
+2025-03-08 23:50:06,184 - INFO - Database connection established.
+2025-03-08 23:50:06,503 - INFO - Starting real-time face recognition. Press 'q' to exit.
+2025-03-08 23:50:21,193 - INFO - Resources released. Exiting.
