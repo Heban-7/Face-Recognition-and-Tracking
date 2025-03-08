@@ -1,12 +1,26 @@
-import os, sys
-import numpy as np
+import os
 import cv2
+import numpy as np
 import psycopg2
 from deepface import DeepFace
 from mtcnn import MTCNN
 from dotenv import load_dotenv
 import uuid
-import json
+import logging
+import argparse
+
+# Ensure logs folder exist
+os.makedirs('../logs', exist_ok=True)
+
+# Cinfigure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format= "%(asctime)s - %(levelname)s - %(message)s",
+    handlers=[
+        logging.FileHandler('../logs/image_based_face_recognition.log'),
+        logging.StreamHandler()
+    ]
+)
 
 # Load environment variables
 load_dotenv("../.env")
@@ -16,8 +30,11 @@ DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
 DB_PORT = os.getenv("DB_PORT")
 
-# Connect to PostgreSQL database
-def connect_db():
+# Global face detector instance
+detector = MTCNN()
+
+def get_db_connection():
+    """Establish a PostgreSQL database connection."""
     try:
         conn = psycopg2.connect(
             host=DB_HOST,
@@ -28,99 +45,127 @@ def connect_db():
         )
         return conn
     except Exception as e:
-        print("Error connecting to database:", e)
+        logging.error("Error connecting to database: %s", e)
         return None
 
-# Fetch stored face embeddings from the database
-def get_stored_faces():
-    conn = connect_db()
+def find_nearest_face(embedding):
+    """
+    Find the nearest face in the database using pgvector similarity search.
+    Returns the matched name and the cosine distance.
+    """
+    conn = get_db_connection()
     if conn is None:
-        return []
-    cursor = conn.cursor()
-    cursor.execute("SELECT id, name, embedding FROM face_embeddings")
-    faces = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    return [(str(face[0]), face[1], np.array(face[2])) for face in faces]
+        return None, None
+    try:
+        cursor = conn.cursor()
+        # Convert embedding to the pgvector literal format.
+        embedding_str = '[' + ','.join(map(str, embedding.tolist())) + ']'
+        query = """
+        SELECT id, name, embedding <=> %s::vector AS cosine_distance
+        FROM face_embeddings
+        ORDER BY embedding <=> %s::vector
+        LIMIT 1;
+        """
+        cursor.execute(query, (embedding_str, embedding_str))
+        result = cursor.fetchone()
+        cursor.close()
+        if result is None:
+            return None, None
+        return result[1], result[2]  # name and cosine_distance
+    except Exception as e:
+        logging.error("Error in find_nearest_face: %s", e)
+        return None, None
+    finally:
+        conn.close()
 
-# Store a new face embedding in the database
 def store_new_face(name, embedding):
-    conn = connect_db()
+    """Store a new face embedding in the database."""
+    conn = get_db_connection()
     if conn is None:
         return
-    cursor = conn.cursor()
-    user_id = uuid.uuid4()
-    query = "INSERT INTO face_embeddings (id, name, embedding) VALUES (%s, %s, %s)"
-    cursor.execute(query, (str(user_id), name, embedding.tolist()))
-    conn.commit()
-    cursor.close()
-    conn.close()
-    print(f"New user {name} stored with ID {user_id}")
+    try:
+        cursor = conn.cursor()
+        user_id = uuid.uuid4()
+        embedding_str = '[' + ','.join(map(str, embedding.tolist())) + ']'
+        query = "INSERT INTO face_embeddings (id, name, embedding) VALUES (%s, %s, %s::vector)"
+        cursor.execute(query, (str(user_id), name, embedding_str))
+        conn.commit()
+        logging.info("New user '%s' stored with ID %s", name, user_id)
+        cursor.close()
+    except Exception as e:
+        logging.error("Error storing new face: %s", e)
+    finally:
+        conn.close()
 
-# Extract face from frame using MTCNN
 def extract_face(frame):
-    detector = MTCNN()
+    """Detect and extract the face from the given image frame."""
     faces = detector.detect_faces(frame)
-    if len(faces) == 0:
+    if not faces:
+        logging.warning("No face detected in the frame.")
         return None
     x, y, width, height = faces[0]['box']
     x, y = abs(x), abs(y)
     face = frame[y:y+height, x:x+width]
-    face = cv2.resize(face, (160, 160))
+    try:
+        face = cv2.resize(face, (160, 160))
+    except Exception as e:
+        logging.error("Error resizing face image: %s", e)
+        return None
     return face
 
-# Recognize face in the given frame
-def recognize_face(frame):
+def get_face_embedding(face_img):
+    """Extract and normalize the face embedding using DeepFace."""
+    try:
+        result = DeepFace.represent(face_img, model_name="Facenet", enforce_detection=False)
+        embedding = np.array(result[0]['embedding'])
+        norm = np.linalg.norm(embedding)
+        if norm != 0:
+            embedding = embedding / norm
+        return embedding
+    except Exception as e:
+        logging.error("Error during face embedding extraction: %s", e)
+        return None
+
+def recognize_face(frame, threshold=0.5):
+    """
+    Recognize the face in a given frame.
+    Returns the recognized name if found (within threshold); otherwise returns the new embedding.
+    """
     face = extract_face(frame)
     if face is None:
-        print("No face detected!")
         return None, None
-    try:
-        # Use the image array with the "img" parameter
-        result = DeepFace.represent(img_path=face, model_name="Facenet", enforce_detection=False)
-        embedding = result[0]['embedding']
-    except Exception as e:
-        print("Error during face embedding:", e)
+    embedding = get_face_embedding(face)
+    if embedding is None:
         return None, None
-
-    stored_faces = get_stored_faces()
-    recognized_name = None
-    threshold = 0.6  # Matching threshold
-    for user_id, name, stored_embedding in stored_faces:
-        distance = np.linalg.norm(np.array(embedding) - stored_embedding)
-        if distance < threshold:
-            recognized_name = name
-            break
-
-    # If a match is found, no need to register a new user; otherwise, return the embedding for registration
-    if recognized_name:
+    recognized_name, cosine_distance = find_nearest_face(embedding)
+    if recognized_name and cosine_distance is not None and cosine_distance < threshold:
         return recognized_name, None
-    else:
-        return None, np.array(embedding)
+    return None, embedding
 
-# Process an image for recognition and optionally register a new user
-def image_recognition(image_path):
+def process_image_recognition(image_path):
+    """Process an image file for face recognition and, if needed, register a new user."""
     frame = cv2.imread(image_path)
     if frame is None:
-        print("Error loading image!")
+        logging.error("Error loading image from path: %s", image_path)
         return
-    # Convert the frame to RGB for proper face detection
     frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     name, new_embedding = recognize_face(frame_rgb)
     
     if name:
-        print(f"Hello, {name}! Welcome back!")
+        logging.info("Hello, %s! Welcome back!", name)
     elif new_embedding is not None:
         new_name = input("New user detected. Please enter your name: ")
         store_new_face(new_name, new_embedding)
-        print(f"Welcome, {new_name}! You have been registered.")
+        logging.info("Welcome, %s! You have been registered.", new_name)
     else:
-        print("No face recognized or detected.")
+        logging.info("No face recognized or detected.")
 
     cv2.imshow("Face Recognition", frame)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    image_path = input("Enter the image path: ")
-    image_recognition(image_path)
+    parser = argparse.ArgumentParser(description="Image-based Face Recognition Pipeline")
+    parser.add_argument("image_path", help="Path to the image file")
+    args = parser.parse_args()
+    process_image_recognition(args.image_path)
